@@ -84,6 +84,7 @@ class GamePanel extends JPanel implements ActionListener {
     private final int HEIGHT = 600;
 
     private ArrayList<Point> snake;
+    private ArrayList<Point> obstacles;
     private Point food;
     private int score;
     private int highScore;
@@ -139,6 +140,7 @@ class GamePanel extends JPanel implements ActionListener {
 
     private void initGame() {
         snake = new ArrayList<>();
+        obstacles = new ArrayList<>();
         direction = 'R';
         running = true;
         gameOver = false;
@@ -152,8 +154,38 @@ class GamePanel extends JPanel implements ActionListener {
 
         spawnFood();
         SoundPlayer.playGameStartSound();
+        timer.setDelay(150); // Reset timer speed
         timer.start();
         repaint();
+    }
+
+    private void spawnObstacle() {
+        boolean validSpot = false;
+        while (!validSpot) {
+            int x = random.nextInt(WIDTH / TILE_SIZE) * TILE_SIZE;
+            int y = random.nextInt(HEIGHT / TILE_SIZE) * TILE_SIZE;
+            Point newObstacle = new Point(x, y);
+
+            validSpot = true;
+            for (Point p : snake) {
+                if (p.equals(newObstacle)) {
+                    validSpot = false;
+                    break;
+                }
+            }
+            if (food != null && food.equals(newObstacle)) {
+                validSpot = false;
+            }
+            for (Point p : obstacles) {
+                if (p.equals(newObstacle)) {
+                    validSpot = false;
+                    break;
+                }
+            }
+            if (validSpot) {
+                obstacles.add(newObstacle);
+            }
+        }
     }
 
     private void spawnFood() {
@@ -165,6 +197,12 @@ class GamePanel extends JPanel implements ActionListener {
 
             validSpot = true;
             for (Point p : snake) {
+                if (p.equals(food)) {
+                    validSpot = false;
+                    break;
+                }
+            }
+            for (Point p : obstacles) {
                 if (p.equals(food)) {
                     validSpot = false;
                     break;
@@ -191,17 +229,26 @@ class GamePanel extends JPanel implements ActionListener {
             g.setColor(Color.RED);
             g.fillRect(food.x, food.y, TILE_SIZE, TILE_SIZE);
 
+            // Draw obstacles
+            g.setColor(Color.LIGHT_GRAY);
+            for (Point p : obstacles) {
+                g.fillRect(p.x, p.y, TILE_SIZE, TILE_SIZE);
+            }
+
             // Draw snake
             g.setColor(Color.GREEN);
             for (Point p : snake) {
                 g.fillRect(p.x, p.y, TILE_SIZE, TILE_SIZE);
             }
 
-            // Draw score
+            // Draw score and level
             g.setColor(Color.WHITE);
             g.setFont(new Font("SansSerif", Font.BOLD, 20));
             g.drawString("Score: " + score, 10, 30);
             g.drawString("High Score: " + highScore, 10, 60);
+            
+            int level = (score >= 5) ? (score / 5) + 1 : 1;
+            g.drawString("Level: " + level, 10, 90);
         }
 
         if (gameOver) {
@@ -291,6 +338,17 @@ class GamePanel extends JPanel implements ActionListener {
             }
         }
 
+        // Check obstacle collisions
+        for (Point p : obstacles) {
+            if (p.equals(newHead)) {
+                running = false;
+                gameOver = true;
+                SoundPlayer.playDieSound();
+                timer.stop();
+                return;
+            }
+        }
+
         snake.add(0, newHead); // Add new head
 
         if (newHead.equals(food)) {
@@ -299,6 +357,13 @@ class GamePanel extends JPanel implements ActionListener {
             if (score > highScore) {
                 highScore = score;
                 saveHighScore();
+            }
+            if (score >= 5 && score % 5 == 0) {
+                spawnObstacle();
+                int currentDelay = timer.getDelay();
+                if (currentDelay > 50) {
+                    timer.setDelay(currentDelay - 10);
+                }
             }
             spawnFood();
         } else {

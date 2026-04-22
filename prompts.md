@@ -33,3 +33,11 @@ Doing this prompt actually initiated the agent to add all the sound effects, for
 
 
 Prompt 10: 
+I want to make the game increase difficulty every level after score 5. I want it to put up random obstacles that if you hit it, it is game over. 
+
+From doing this it created a random obstacle every 5 points. It also increase the speed of the snake every time I level up
+
+I think what would make it better would be if more obstacles popped up rather than just one extra obstacle every 5 points. I will prompt that next...
+
+Prompt 11: 
+I want to make it more difficult by adding more obstacles to the game. I think that what would make it more fun would be if there were more obstacles than just one extra obstacle every 5 points. 
