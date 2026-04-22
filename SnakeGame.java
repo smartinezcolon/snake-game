@@ -95,7 +95,8 @@ class GamePanel extends JPanel implements ActionListener {
     private ArrayList<Point> obstacles;
     private Point food;
     private int score;
-    private int highScore;
+    private int classicHighScore;
+    private int obstacleHighScore;
     private Timer timer;
     private char direction = 'R'; // 'U', 'D', 'L', 'R'
     private boolean running = false;
@@ -119,24 +120,42 @@ class GamePanel extends JPanel implements ActionListener {
 
     private void loadHighScore() {
         try {
-            File f = new File("highscore.txt");
+            File f = new File("highscore_classic.txt");
             if (f.exists()) {
                 Scanner s = new Scanner(f);
                 if (s.hasNextInt()) {
-                    highScore = s.nextInt();
+                    classicHighScore = s.nextInt();
                 }
                 s.close();
             }
         } catch (FileNotFoundException e) {
-            highScore = 0;
+            classicHighScore = 0;
+        }
+        try {
+            File f2 = new File("highscore_obstacle.txt");
+            if (f2.exists()) {
+                Scanner s2 = new Scanner(f2);
+                if (s2.hasNextInt()) {
+                    obstacleHighScore = s2.nextInt();
+                }
+                s2.close();
+            }
+        } catch (FileNotFoundException e) {
+            obstacleHighScore = 0;
         }
     }
 
     private void saveHighScore() {
         try {
-            PrintWriter pw = new PrintWriter("highscore.txt");
-            pw.println(highScore);
-            pw.close();
+            if (isObstacleMode) {
+                PrintWriter pw = new PrintWriter("highscore_obstacle.txt");
+                pw.println(obstacleHighScore);
+                pw.close();
+            } else {
+                PrintWriter pw = new PrintWriter("highscore_classic.txt");
+                pw.println(classicHighScore);
+                pw.close();
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -255,7 +274,8 @@ class GamePanel extends JPanel implements ActionListener {
             g.setColor(Color.WHITE);
             g.setFont(new Font("SansSerif", Font.BOLD, 20));
             g.drawString("Score: " + score, 10, 30);
-            g.drawString("High Score: " + highScore, 10, 60);
+            int currentHighScore = isObstacleMode ? obstacleHighScore : classicHighScore;
+            g.drawString("High Score: " + currentHighScore, 10, 60);
             
             int level = (score >= 5) ? (score / 5) + 1 : 1;
             if (isObstacleMode) {
@@ -271,7 +291,8 @@ class GamePanel extends JPanel implements ActionListener {
     private void drawGameOver(Graphics g) {
         String msg = "Game Over";
         String scoreMsg = "Final Score: " + score;
-        String highScoreMsg = "High Score: " + highScore;
+        int currentHighScore = isObstacleMode ? obstacleHighScore : classicHighScore;
+        String highScoreMsg = "High Score: " + currentHighScore;
         String restartMsg = "Press 'R' to Restart";
         String menuMsg = "Press 'M' for Main Menu";
 
@@ -366,9 +387,16 @@ class GamePanel extends JPanel implements ActionListener {
         if (newHead.equals(food)) {
             SoundPlayer.playEatSound();
             score++;
-            if (score > highScore) {
-                highScore = score;
-                saveHighScore();
+            if (isObstacleMode) {
+                if (score > obstacleHighScore) {
+                    obstacleHighScore = score;
+                    saveHighScore();
+                }
+            } else {
+                if (score > classicHighScore) {
+                    classicHighScore = score;
+                    saveHighScore();
+                }
             }
             if (isObstacleMode && score >= 5 && score % 5 == 0) {
                 int level = (score / 5) + 1;

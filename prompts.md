@@ -52,4 +52,4 @@ I want to have the option to switch between the classic snake game and the new s
     Prompt 13: 
     I want to have seperate highscores for each game mode. 
 
-    
+    Doing this at first timeout the agent, then I retried it again and it started generating. So now the game has two seperate highscores for each game mode. 
