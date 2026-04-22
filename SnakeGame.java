@@ -21,21 +21,21 @@ public class SnakeGame {
         JFrame frame = new JFrame("Snake");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
-        
+
         CardLayout cardLayout = new CardLayout();
         JPanel mainPanel = new JPanel(cardLayout);
-        
+
         GamePanel gamePanel = new GamePanel();
         MenuPanel menuPanel = new MenuPanel(e -> {
             cardLayout.show(mainPanel, "Game");
             gamePanel.startGame();
         });
-        
+
         mainPanel.add(menuPanel, "Menu");
         mainPanel.add(gamePanel, "Game");
-        
+
         frame.add(mainPanel);
-        
+
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
@@ -47,20 +47,20 @@ class MenuPanel extends JPanel {
         this.setPreferredSize(new Dimension(600, 600));
         this.setBackground(Color.DARK_GRAY);
         this.setLayout(null);
-        
+
         JButton startButton = new JButton("Start Game");
         startButton.setFont(new Font("SansSerif", Font.BOLD, 24));
         startButton.setFocusPainted(false);
         startButton.setBounds(200, 350, 200, 60);
         startButton.addActionListener(startAction);
-        
+
         this.add(startButton);
     }
-    
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        
+
         g.setColor(Color.GREEN);
         g.setFont(new Font("SansSerif", Font.BOLD, 80));
         String title = "SNAKE";
@@ -73,7 +73,7 @@ class GamePanel extends JPanel implements ActionListener {
     private final int TILE_SIZE = 30;
     private final int WIDTH = 600;
     private final int HEIGHT = 600;
-    
+
     private ArrayList<Point> snake;
     private Point food;
     private int score;
@@ -89,16 +89,16 @@ class GamePanel extends JPanel implements ActionListener {
         this.setBackground(Color.DARK_GRAY);
         this.setFocusable(true);
         this.addKeyListener(new MyKeyAdapter());
-        
+
         random = new Random();
         timer = new Timer(150, this);
     }
-    
+
     public void startGame() {
         initGame();
         this.requestFocusInWindow();
     }
-    
+
     private void initGame() {
         snake = new ArrayList<>();
         direction = 'R';
@@ -106,24 +106,24 @@ class GamePanel extends JPanel implements ActionListener {
         gameOver = false;
         directionChangedThisTick = false;
         score = 0;
-        
+
         // Start near the center
         snake.add(new Point(10 * TILE_SIZE, 10 * TILE_SIZE)); // Head
-        snake.add(new Point(9 * TILE_SIZE, 10 * TILE_SIZE));  // Body
-        snake.add(new Point(8 * TILE_SIZE, 10 * TILE_SIZE));  // Tail
-        
+        snake.add(new Point(9 * TILE_SIZE, 10 * TILE_SIZE)); // Body
+        snake.add(new Point(8 * TILE_SIZE, 10 * TILE_SIZE)); // Tail
+
         spawnFood();
         timer.start();
         repaint();
     }
-    
+
     private void spawnFood() {
         boolean validSpot = false;
         while (!validSpot) {
             int x = random.nextInt(WIDTH / TILE_SIZE) * TILE_SIZE;
             int y = random.nextInt(HEIGHT / TILE_SIZE) * TILE_SIZE;
             food = new Point(x, y);
-            
+
             validSpot = true;
             for (Point p : snake) {
                 if (p.equals(food)) {
@@ -137,7 +137,7 @@ class GamePanel extends JPanel implements ActionListener {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        
+
         // Draw grid
         g.setColor(new Color(50, 50, 50));
         for (int i = 0; i <= WIDTH / TILE_SIZE; i++) {
@@ -146,46 +146,46 @@ class GamePanel extends JPanel implements ActionListener {
         for (int i = 0; i <= HEIGHT / TILE_SIZE; i++) {
             g.drawLine(0, i * TILE_SIZE, WIDTH, i * TILE_SIZE);
         }
-        
+
         if (running || gameOver) {
             // Draw food
             g.setColor(Color.RED);
             g.fillRect(food.x, food.y, TILE_SIZE, TILE_SIZE);
-            
+
             // Draw snake
             g.setColor(Color.GREEN);
             for (Point p : snake) {
                 g.fillRect(p.x, p.y, TILE_SIZE, TILE_SIZE);
             }
-            
+
             // Draw score
             g.setColor(Color.WHITE);
             g.setFont(new Font("SansSerif", Font.BOLD, 20));
             g.drawString("Score: " + score, 10, 30);
         }
-        
+
         if (gameOver) {
             drawGameOver(g);
         }
     }
-    
+
     private void drawGameOver(Graphics g) {
         String msg = "Game Over";
         String scoreMsg = "Final Score: " + score;
         String restartMsg = "Press 'R' to Restart";
-        
+
         // Game Over Text
         g.setColor(Color.RED);
         g.setFont(new Font("SansSerif", Font.BOLD, 50));
         FontMetrics metrics1 = getFontMetrics(g.getFont());
         g.drawString(msg, (WIDTH - metrics1.stringWidth(msg)) / 2, HEIGHT / 2 - 50);
-        
+
         // Score Text
         g.setColor(Color.WHITE);
         g.setFont(new Font("SansSerif", Font.BOLD, 30));
         FontMetrics metrics2 = getFontMetrics(g.getFont());
         g.drawString(scoreMsg, (WIDTH - metrics2.stringWidth(scoreMsg)) / 2, HEIGHT / 2 + 10);
-        
+
         // Restart Text
         g.setFont(new Font("SansSerif", Font.PLAIN, 20));
         FontMetrics metrics3 = getFontMetrics(g.getFont());
@@ -199,21 +199,29 @@ class GamePanel extends JPanel implements ActionListener {
         }
         repaint();
     }
-    
+
     private void move() {
         Point head = snake.get(0);
         Point newHead = new Point(head.x, head.y);
-        
+
         switch (direction) {
-            case 'U': newHead.y -= TILE_SIZE; break;
-            case 'D': newHead.y += TILE_SIZE; break;
-            case 'L': newHead.x -= TILE_SIZE; break;
-            case 'R': newHead.x += TILE_SIZE; break;
+            case 'U':
+                newHead.y -= TILE_SIZE;
+                break;
+            case 'D':
+                newHead.y += TILE_SIZE;
+                break;
+            case 'L':
+                newHead.x -= TILE_SIZE;
+                break;
+            case 'R':
+                newHead.x += TILE_SIZE;
+                break;
         }
-        
+
         // Reset direction change flag
         directionChangedThisTick = false;
-        
+
         // Check wall collisions
         if (newHead.x < 0 || newHead.x >= WIDTH || newHead.y < 0 || newHead.y >= HEIGHT) {
             running = false;
@@ -221,7 +229,7 @@ class GamePanel extends JPanel implements ActionListener {
             timer.stop();
             return;
         }
-        
+
         // Check self collisions
         for (Point p : snake) {
             if (p.equals(newHead)) {
@@ -231,9 +239,9 @@ class GamePanel extends JPanel implements ActionListener {
                 return;
             }
         }
-        
+
         snake.add(0, newHead); // Add new head
-        
+
         if (newHead.equals(food)) {
             score++;
             spawnFood();
@@ -241,7 +249,7 @@ class GamePanel extends JPanel implements ActionListener {
             snake.remove(snake.size() - 1); // Remove tail
         }
     }
-    
+
     private class MyKeyAdapter extends KeyAdapter {
         @Override
         public void keyPressed(KeyEvent e) {
@@ -249,21 +257,34 @@ class GamePanel extends JPanel implements ActionListener {
                 initGame();
                 return;
             }
-            
-            if (directionChangedThisTick) return;
-            
+
+            if (directionChangedThisTick)
+                return;
+
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_LEFT:
-                    if (direction != 'R') { direction = 'L'; directionChangedThisTick = true; }
+                    if (direction != 'R') {
+                        direction = 'L';
+                        directionChangedThisTick = true;
+                    }
                     break;
                 case KeyEvent.VK_RIGHT:
-                    if (direction != 'L') { direction = 'R'; directionChangedThisTick = true; }
+                    if (direction != 'L') {
+                        direction = 'R';
+                        directionChangedThisTick = true;
+                    }
                     break;
                 case KeyEvent.VK_UP:
-                    if (direction != 'D') { direction = 'U'; directionChangedThisTick = true; }
+                    if (direction != 'D') {
+                        direction = 'U';
+                        directionChangedThisTick = true;
+                    }
                     break;
                 case KeyEvent.VK_DOWN:
-                    if (direction != 'U') { direction = 'D'; directionChangedThisTick = true; }
+                    if (direction != 'U') {
+                        direction = 'D';
+                        directionChangedThisTick = true;
+                    }
                     break;
             }
         }
