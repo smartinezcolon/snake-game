@@ -22,3 +22,14 @@ This added a high score display to the game screen and on the game over screen.
 
 Prompt 8: 
 I would like to add sound effects for the snake eating food, the snake dying, and the game starting. 
+
+Surpsingly this prompt would not work with the agent. It kept timing out. So I decided to try doing one sound affect at a time. 
+
+
+Prompt 9:
+add sound effect to when the game starts
+
+Doing this prompt actually initiated the agent to add all the sound effects, for the snake gme starting, snake eating and snake dying. 
+
+
+Prompt 10: 

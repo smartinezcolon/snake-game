@@ -19,6 +19,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Scanner;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.SourceDataLine;
 
 public class SnakeGame {
     public static void main(String[] args) {
@@ -148,6 +151,7 @@ class GamePanel extends JPanel implements ActionListener {
         snake.add(new Point(8 * TILE_SIZE, 10 * TILE_SIZE)); // Tail
 
         spawnFood();
+        SoundPlayer.playGameStartSound();
         timer.start();
         repaint();
     }
@@ -271,6 +275,7 @@ class GamePanel extends JPanel implements ActionListener {
         if (newHead.x < 0 || newHead.x >= WIDTH || newHead.y < 0 || newHead.y >= HEIGHT) {
             running = false;
             gameOver = true;
+            SoundPlayer.playDieSound();
             timer.stop();
             return;
         }
@@ -280,6 +285,7 @@ class GamePanel extends JPanel implements ActionListener {
             if (p.equals(newHead)) {
                 running = false;
                 gameOver = true;
+                SoundPlayer.playDieSound();
                 timer.stop();
                 return;
             }
@@ -288,6 +294,7 @@ class GamePanel extends JPanel implements ActionListener {
         snake.add(0, newHead); // Add new head
 
         if (newHead.equals(food)) {
+            SoundPlayer.playEatSound();
             score++;
             if (score > highScore) {
                 highScore = score;
@@ -342,5 +349,46 @@ class GamePanel extends JPanel implements ActionListener {
                     break;
             }
         }
+    }
+}
+
+class SoundPlayer {
+    public static void playTone(int hz, int msecs, double vol) {
+        new Thread(() -> {
+            try {
+                float sampleRate = 44100;
+                byte[] buf = new byte[1];
+                AudioFormat af = new AudioFormat(sampleRate, 8, 1, true, false);
+                SourceDataLine sdl = AudioSystem.getSourceDataLine(af);
+                sdl.open(af);
+                sdl.start();
+                for (int i = 0; i < msecs * sampleRate / 1000; i++) {
+                    double angle = i / (sampleRate / hz) * 2.0 * Math.PI;
+                    buf[0] = (byte) (Math.sin(angle) * 127.0 * vol);
+                    sdl.write(buf, 0, 1);
+                }
+                sdl.drain();
+                sdl.stop();
+                sdl.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    public static void playEatSound() {
+        playTone(1200, 100, 0.5);
+    }
+
+    public static void playDieSound() {
+        playTone(300, 500, 0.5);
+    }
+
+    public static void playGameStartSound() {
+        new Thread(() -> {
+            playTone(880, 150, 0.5);
+            try { Thread.sleep(150); } catch (Exception e) {}
+            playTone(1046, 200, 0.5);
+        }).start();
     }
 }
