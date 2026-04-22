@@ -1,6 +1,8 @@
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -20,15 +22,50 @@ public class SnakeGame {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
         
+        CardLayout cardLayout = new CardLayout();
+        JPanel mainPanel = new JPanel(cardLayout);
+        
         GamePanel gamePanel = new GamePanel();
-        frame.add(gamePanel);
+        MenuPanel menuPanel = new MenuPanel(e -> {
+            cardLayout.show(mainPanel, "Game");
+            gamePanel.startGame();
+        });
+        
+        mainPanel.add(menuPanel, "Menu");
+        mainPanel.add(gamePanel, "Game");
+        
+        frame.add(mainPanel);
         
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+    }
+}
+
+class MenuPanel extends JPanel {
+    public MenuPanel(ActionListener startAction) {
+        this.setPreferredSize(new Dimension(600, 600));
+        this.setBackground(Color.DARK_GRAY);
+        this.setLayout(null);
         
-        // Ensure the panel requests focus to receive key events
-        gamePanel.requestFocusInWindow();
+        JButton startButton = new JButton("Start Game");
+        startButton.setFont(new Font("SansSerif", Font.BOLD, 24));
+        startButton.setFocusPainted(false);
+        startButton.setBounds(200, 350, 200, 60);
+        startButton.addActionListener(startAction);
+        
+        this.add(startButton);
+    }
+    
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        
+        g.setColor(Color.GREEN);
+        g.setFont(new Font("SansSerif", Font.BOLD, 80));
+        String title = "SNAKE";
+        FontMetrics metrics = getFontMetrics(g.getFont());
+        g.drawString(title, (600 - metrics.stringWidth(title)) / 2, 250);
     }
 }
 
@@ -55,7 +92,11 @@ class GamePanel extends JPanel implements ActionListener {
         
         random = new Random();
         timer = new Timer(150, this);
+    }
+    
+    public void startGame() {
         initGame();
+        this.requestFocusInWindow();
     }
     
     private void initGame() {

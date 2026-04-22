@@ -5,3 +5,8 @@ Now extend SnakeGame.java. Keep it as one file. Add a dark background grid and d
 Prompt 3:
 Make the snake move automatically using a Swing timer that ticks every 150 milliseconds. Add arrow key controls so the player can steer, but don't allow the snake to reverse direction. For now, have the snake wrap around the edges instead of dying. Make sure the panel can receive keyboard input.
 Prompt 4:
+Add a food pellet that spawns at a random empty cell. When the snake eats it, grow by one segment and spawn new food. Add collision detection: hitting a wall or the snake's own body should end the game, stop movement, and show a "Game Over" message with the final score. Display the current score in the top-left corner during play. When the game is over, let the player press R to reset everything and play again.
+Prompt 5:
+I want to add a main menu of the snake game that has a start button
+
+Add a main menu with a "Start Game" button. When clicked, switch to the game panel and start the game. Add a separate Game Over screen with the final score and a "Play Again" button that restarts the game. Make sure the game panel requests focus correctly.
