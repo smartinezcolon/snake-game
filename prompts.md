@@ -12,3 +12,13 @@ I want to add a main menu of the snake game that has a start button
 Add a main menu with a "Start Game" button. When clicked, switch to the game panel and start the game. Add a separate Game Over screen with the final score and a "Play Again" button that restarts the game. Make sure the game panel requests focus correctly.
 Prompt 6: 
 At the 'gameover' section I would like to add a m for mainmenu that takes me back to the mainmenu of the game
+
+This added a menu option to the gameover screen that takes you back to the main menu. 
+
+Prompt 7: 
+I want to add a highscore that persists across all games
+
+This added a high score display to the game screen and on the game over screen. 
+
+Prompt 8: 
+I would like to add sound effects for the snake eating food, the snake dying, and the game starting. 

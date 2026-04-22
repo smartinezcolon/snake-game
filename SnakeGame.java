@@ -15,6 +15,10 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Random;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.Scanner;
 
 public class SnakeGame {
     public static void main(String[] args) {
@@ -79,6 +83,7 @@ class GamePanel extends JPanel implements ActionListener {
     private ArrayList<Point> snake;
     private Point food;
     private int score;
+    private int highScore;
     private Timer timer;
     private char direction = 'R'; // 'U', 'D', 'L', 'R'
     private boolean running = false;
@@ -96,6 +101,32 @@ class GamePanel extends JPanel implements ActionListener {
 
         random = new Random();
         timer = new Timer(150, this);
+        loadHighScore();
+    }
+
+    private void loadHighScore() {
+        try {
+            File f = new File("highscore.txt");
+            if (f.exists()) {
+                Scanner s = new Scanner(f);
+                if (s.hasNextInt()) {
+                    highScore = s.nextInt();
+                }
+                s.close();
+            }
+        } catch (FileNotFoundException e) {
+            highScore = 0;
+        }
+    }
+
+    private void saveHighScore() {
+        try {
+            PrintWriter pw = new PrintWriter("highscore.txt");
+            pw.println(highScore);
+            pw.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public void startGame() {
@@ -166,6 +197,7 @@ class GamePanel extends JPanel implements ActionListener {
             g.setColor(Color.WHITE);
             g.setFont(new Font("SansSerif", Font.BOLD, 20));
             g.drawString("Score: " + score, 10, 30);
+            g.drawString("High Score: " + highScore, 10, 60);
         }
 
         if (gameOver) {
@@ -176,6 +208,7 @@ class GamePanel extends JPanel implements ActionListener {
     private void drawGameOver(Graphics g) {
         String msg = "Game Over";
         String scoreMsg = "Final Score: " + score;
+        String highScoreMsg = "High Score: " + highScore;
         String restartMsg = "Press 'R' to Restart";
         String menuMsg = "Press 'M' for Main Menu";
 
@@ -190,15 +223,18 @@ class GamePanel extends JPanel implements ActionListener {
         g.setFont(new Font("SansSerif", Font.BOLD, 30));
         FontMetrics metrics2 = getFontMetrics(g.getFont());
         g.drawString(scoreMsg, (WIDTH - metrics2.stringWidth(scoreMsg)) / 2, HEIGHT / 2 + 10);
+        
+        FontMetrics metricsHS = getFontMetrics(g.getFont());
+        g.drawString(highScoreMsg, (WIDTH - metricsHS.stringWidth(highScoreMsg)) / 2, HEIGHT / 2 + 50);
 
         // Restart Text
         g.setFont(new Font("SansSerif", Font.PLAIN, 20));
         FontMetrics metrics3 = getFontMetrics(g.getFont());
-        g.drawString(restartMsg, (WIDTH - metrics3.stringWidth(restartMsg)) / 2, HEIGHT / 2 + 60);
+        g.drawString(restartMsg, (WIDTH - metrics3.stringWidth(restartMsg)) / 2, HEIGHT / 2 + 100);
 
         // Menu Text
         FontMetrics metrics4 = getFontMetrics(g.getFont());
-        g.drawString(menuMsg, (WIDTH - metrics4.stringWidth(menuMsg)) / 2, HEIGHT / 2 + 90);
+        g.drawString(menuMsg, (WIDTH - metrics4.stringWidth(menuMsg)) / 2, HEIGHT / 2 + 130);
     }
 
     @Override
@@ -253,6 +289,10 @@ class GamePanel extends JPanel implements ActionListener {
 
         if (newHead.equals(food)) {
             score++;
+            if (score > highScore) {
+                highScore = score;
+                saveHighScore();
+            }
             spawnFood();
         } else {
             snake.remove(snake.size() - 1); // Remove tail
