@@ -359,7 +359,10 @@ class GamePanel extends JPanel implements ActionListener {
                 saveHighScore();
             }
             if (score >= 5 && score % 5 == 0) {
-                spawnObstacle();
+                int level = (score / 5) + 1;
+                for (int i = 0; i < level; i++) {
+                    spawnObstacle();
+                }
                 int currentDelay = timer.getDelay();
                 if (currentDelay > 50) {
                     timer.setDelay(currentDelay - 10);

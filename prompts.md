@@ -41,3 +41,9 @@ I think what would make it better would be if more obstacles popped up rather th
 
 Prompt 11: 
 I want to make it more difficult by adding more obstacles to the game. I think that what would make it more fun would be if there were more obstacles than just one extra obstacle every 5 points. 
+
+Doing this added 2 obstacles at 5 points, then 3 more obstacles at 10, and 4 more obstacles at 15, and so on which made the game more fun and difficult. 
+
+Prompt 12: 
+I want to have the option to switch between the classic snake game and the new snake game with the obstacles. 
+    
