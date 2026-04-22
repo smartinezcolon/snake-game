@@ -22,6 +22,7 @@ import java.util.Scanner;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.SourceDataLine;
+import java.util.function.Consumer;
 
 public class SnakeGame {
     public static void main(String[] args) {
@@ -35,9 +36,9 @@ public class SnakeGame {
         GamePanel gamePanel = new GamePanel(() -> {
             cardLayout.show(mainPanel, "Menu");
         });
-        MenuPanel menuPanel = new MenuPanel(e -> {
+        MenuPanel menuPanel = new MenuPanel(obstacleMode -> {
             cardLayout.show(mainPanel, "Game");
-            gamePanel.startGame();
+            gamePanel.startGame(obstacleMode);
         });
 
         mainPanel.add(menuPanel, "Menu");
@@ -52,18 +53,25 @@ public class SnakeGame {
 }
 
 class MenuPanel extends JPanel {
-    public MenuPanel(ActionListener startAction) {
+    public MenuPanel(Consumer<Boolean> startAction) {
         this.setPreferredSize(new Dimension(600, 600));
         this.setBackground(Color.DARK_GRAY);
         this.setLayout(null);
 
-        JButton startButton = new JButton("Start Game");
-        startButton.setFont(new Font("SansSerif", Font.BOLD, 24));
-        startButton.setFocusPainted(false);
-        startButton.setBounds(200, 350, 200, 60);
-        startButton.addActionListener(startAction);
+        JButton classicButton = new JButton("Classic Mode");
+        classicButton.setFont(new Font("SansSerif", Font.BOLD, 20));
+        classicButton.setFocusPainted(false);
+        classicButton.setBounds(200, 320, 200, 50);
+        classicButton.addActionListener(e -> startAction.accept(false));
 
-        this.add(startButton);
+        JButton obstacleButton = new JButton("Obstacle Mode");
+        obstacleButton.setFont(new Font("SansSerif", Font.BOLD, 20));
+        obstacleButton.setFocusPainted(false);
+        obstacleButton.setBounds(200, 390, 200, 50);
+        obstacleButton.addActionListener(e -> startAction.accept(true));
+
+        this.add(classicButton);
+        this.add(obstacleButton);
     }
 
     @Override
@@ -93,6 +101,7 @@ class GamePanel extends JPanel implements ActionListener {
     private boolean running = false;
     private boolean gameOver = false;
     private boolean directionChangedThisTick = false;
+    private boolean isObstacleMode = false;
     private Random random;
     private Runnable goToMenuAction;
 
@@ -133,7 +142,8 @@ class GamePanel extends JPanel implements ActionListener {
         }
     }
 
-    public void startGame() {
+    public void startGame(boolean obstacleMode) {
+        this.isObstacleMode = obstacleMode;
         initGame();
         this.requestFocusInWindow();
     }
@@ -248,7 +258,9 @@ class GamePanel extends JPanel implements ActionListener {
             g.drawString("High Score: " + highScore, 10, 60);
             
             int level = (score >= 5) ? (score / 5) + 1 : 1;
-            g.drawString("Level: " + level, 10, 90);
+            if (isObstacleMode) {
+                g.drawString("Level: " + level, 10, 90);
+            }
         }
 
         if (gameOver) {
@@ -358,7 +370,7 @@ class GamePanel extends JPanel implements ActionListener {
                 highScore = score;
                 saveHighScore();
             }
-            if (score >= 5 && score % 5 == 0) {
+            if (isObstacleMode && score >= 5 && score % 5 == 0) {
                 int level = (score / 5) + 1;
                 for (int i = 0; i < level; i++) {
                     spawnObstacle();

@@ -46,4 +46,10 @@ Doing this added 2 obstacles at 5 points, then 3 more obstacles at 10, and 4 mor
 
 Prompt 12: 
 I want to have the option to switch between the classic snake game and the new snake game with the obstacles. 
+
+    Doing this added to game modes, classic and obstacles mode. However doing this I noticed the highscore is the same for both game modes so I will prompt to have seperate highscores for each game mode.
+
+    Prompt 13: 
+    I want to have seperate highscores for each game mode. 
+
     
