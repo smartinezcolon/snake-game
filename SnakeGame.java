@@ -25,7 +25,9 @@ public class SnakeGame {
         CardLayout cardLayout = new CardLayout();
         JPanel mainPanel = new JPanel(cardLayout);
 
-        GamePanel gamePanel = new GamePanel();
+        GamePanel gamePanel = new GamePanel(() -> {
+            cardLayout.show(mainPanel, "Menu");
+        });
         MenuPanel menuPanel = new MenuPanel(e -> {
             cardLayout.show(mainPanel, "Game");
             gamePanel.startGame();
@@ -83,8 +85,10 @@ class GamePanel extends JPanel implements ActionListener {
     private boolean gameOver = false;
     private boolean directionChangedThisTick = false;
     private Random random;
+    private Runnable goToMenuAction;
 
-    public GamePanel() {
+    public GamePanel(Runnable goToMenuAction) {
+        this.goToMenuAction = goToMenuAction;
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
         this.setBackground(Color.DARK_GRAY);
         this.setFocusable(true);
@@ -173,6 +177,7 @@ class GamePanel extends JPanel implements ActionListener {
         String msg = "Game Over";
         String scoreMsg = "Final Score: " + score;
         String restartMsg = "Press 'R' to Restart";
+        String menuMsg = "Press 'M' for Main Menu";
 
         // Game Over Text
         g.setColor(Color.RED);
@@ -190,6 +195,10 @@ class GamePanel extends JPanel implements ActionListener {
         g.setFont(new Font("SansSerif", Font.PLAIN, 20));
         FontMetrics metrics3 = getFontMetrics(g.getFont());
         g.drawString(restartMsg, (WIDTH - metrics3.stringWidth(restartMsg)) / 2, HEIGHT / 2 + 60);
+
+        // Menu Text
+        FontMetrics metrics4 = getFontMetrics(g.getFont());
+        g.drawString(menuMsg, (WIDTH - metrics4.stringWidth(menuMsg)) / 2, HEIGHT / 2 + 90);
     }
 
     @Override
@@ -253,9 +262,14 @@ class GamePanel extends JPanel implements ActionListener {
     private class MyKeyAdapter extends KeyAdapter {
         @Override
         public void keyPressed(KeyEvent e) {
-            if (gameOver && e.getKeyCode() == KeyEvent.VK_R) {
-                initGame();
-                return;
+            if (gameOver) {
+                if (e.getKeyCode() == KeyEvent.VK_R) {
+                    initGame();
+                    return;
+                } else if (e.getKeyCode() == KeyEvent.VK_M) {
+                    goToMenuAction.run();
+                    return;
+                }
             }
 
             if (directionChangedThisTick)

@@ -10,3 +10,5 @@ Prompt 5:
 I want to add a main menu of the snake game that has a start button
 
 Add a main menu with a "Start Game" button. When clicked, switch to the game panel and start the game. Add a separate Game Over screen with the final score and a "Play Again" button that restarts the game. Make sure the game panel requests focus correctly.
+Prompt 6: 
+At the 'gameover' section I would like to add a m for mainmenu that takes me back to the mainmenu of the game
